@@ -16,7 +16,9 @@ def correlation(
 ) -> np.ndarray:
     correlation = np.corrcoef(
         [
-            ts._data[(ts._data[DT] >= from_date) & (ts._data[DT] <= to_date)][VALUES]
+            ts.raw_data[(ts.raw_data[DT] >= from_date) & (ts.raw_data[DT] <= to_date)][
+                VALUES
+            ]
             for ts in ts
         ]
     )
@@ -36,7 +38,7 @@ def get_correlation_energy(
 
 @dataclass
 class TimeSeries:
-    _data: pd.DataFrame  # values, dt
+    raw_data: pd.DataFrame  # values, dt
 
     def calculate_value_at_end(
         self,
@@ -44,8 +46,8 @@ class TimeSeries:
         to_date: dt.datetime,
         initial_investiment: float = 1.0,
     ) -> float:
-        values = self._data[
-            (self._data[DT] >= from_date) & (self._data[DT] <= to_date)
+        values = self.raw_data[
+            (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
 
         product: float = values.product()  # type: ignore
@@ -53,24 +55,24 @@ class TimeSeries:
         return product * initial_investiment
 
     def average(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
-        values = self._data[
-            (self._data[DT] >= from_date) & (self._data[DT] <= to_date)
+        values = self.raw_data[
+            (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
 
         mean = values.mean()
         return mean  # type: ignore
 
     def variance(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
-        values = self._data[
-            (self._data[DT] >= from_date) & (self._data[DT] <= to_date)
+        values = self.raw_data[
+            (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
 
         var: float = values.var()  # type: ignore
         return var
 
     def geometric_mean(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
-        values = self._data[
-            (self._data[DT] >= from_date) & (self._data[DT] <= to_date)
+        values = self.raw_data[
+            (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
 
         product: float = values.product()  # type: ignore
@@ -84,15 +86,49 @@ class TimeSeries:
         from_date: dt.datetime,
         to_date: dt.datetime,
     ) -> float:
-        values1 = self._data[
-            (self._data[DT] >= from_date) & (self._data[DT] <= to_date)
+        values1 = self.raw_data[
+            (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
 
-        values2 = other._data[
-            (other._data[DT] >= from_date) & (other._data[DT] <= to_date)
+        values2 = other.raw_data[
+            (other.raw_data[DT] >= from_date) & (other.raw_data[DT] <= to_date)
         ][VALUES]
 
         return np.corrcoef(values1, values2)[0, 1]
+
+
+class Portfolio:
+    def __init__(self, time_series: List[TimeSeries], split: List[float]):
+        self.time_series = time_series
+
+        if len(split) != len(time_series):
+            raise ValueError("Split must have same length as time series")
+
+        if sum(split) != 1:
+            raise ValueError("Split must sum to 1")
+
+        self.split = split
+
+    def correlation_energy(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
+        return get_correlation_energy(self.time_series, from_date, to_date)
+
+    def correlation(self, from_date: dt.datetime, to_date: dt.datetime) -> np.ndarray:
+        return correlation(self.time_series, from_date, to_date)
+
+    def calculate_value_at_end(
+        self,
+        from_date: dt.datetime,
+        to_date: dt.datetime,
+        initial_investiment: float = 1.0,
+    ) -> float:
+        return sum(
+            [
+                ts.calculate_value_at_end(
+                    from_date, to_date, initial_investiment * split
+                )
+                for split, ts in zip(self.split, self.time_series)
+            ]
+        )
 
 
 def main():
