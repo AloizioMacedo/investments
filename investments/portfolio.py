@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import itertools
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -53,9 +53,19 @@ class TimeSeries:
 
         product: float = values.product()  # type: ignore
 
+        self._min_date = values[DT].min()
+        self._max_date = values[DT].max()
+
         return product * initial_investiment
 
-    def average(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
+    def average(
+        self,
+        from_date: Optional[dt.datetime] = None,
+        to_date: Optional[dt.datetime] = None,
+    ) -> float:
+        from_date = from_date if from_date is not None else self._min_date
+        to_date = to_date if to_date is not None else self._max_date
+
         values = self.raw_data[
             (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
@@ -63,7 +73,14 @@ class TimeSeries:
         mean = values.mean()
         return mean  # type: ignore
 
-    def variance(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
+    def variance(
+        self,
+        from_date: Optional[dt.datetime] = None,
+        to_date: Optional[dt.datetime] = None,
+    ) -> float:
+        from_date = from_date if from_date is not None else self._min_date
+        to_date = to_date if to_date is not None else self._max_date
+
         values = self.raw_data[
             (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
@@ -71,7 +88,12 @@ class TimeSeries:
         var: float = values.var()  # type: ignore
         return var
 
-    def geometric_mean(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
+    def geometric_mean(
+        self, from_date: Optional[dt.datetime], to_date: Optional[dt.datetime]
+    ) -> float:
+        from_date = from_date if from_date is not None else self._min_date
+        to_date = to_date if to_date is not None else self._max_date
+
         values = self.raw_data[
             (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
@@ -84,9 +106,12 @@ class TimeSeries:
     def correlation(
         self,
         other: TimeSeries,
-        from_date: dt.datetime,
-        to_date: dt.datetime,
+        from_date: Optional[dt.datetime],
+        to_date: Optional[dt.datetime],
     ) -> float:
+        from_date = from_date if from_date is not None else self._min_date
+        to_date = to_date if to_date is not None else self._max_date
+
         values1 = self.raw_data[
             (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
