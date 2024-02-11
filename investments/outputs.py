@@ -47,6 +47,7 @@ def main():
     vols = []
     rets = []
     grans = []
+
     for gran in possible_granularities:
         gran = list(gran)
         p = Portfolio(best, gran)
@@ -65,8 +66,9 @@ def main():
 
     x_hull = [points[i][0] for i in ch.vertices]
     y_hull = [points[i][1] for i in ch.vertices]
+    hover_names = [grans[i] for i in ch.vertices]
 
-    fig2 = px.scatter(x=x_hull, y=y_hull)
+    fig2 = px.scatter(x=x_hull, y=y_hull, hover_name=hover_names)
     fig2.write_html(OUTPUTS_FILES.joinpath("convex_hull.html"))
     fig2.write_image(OUTPUTS_FILES.joinpath("convex_hull.png"))
 
