@@ -8,5 +8,10 @@ class FundsFilters(BaseModel):
     funds: List[str]
 
 
+class Portfolio(BaseModel):
+    number_of_funds: int
+
+
 class Config(BaseModel):
     funds_filters: FundsFilters
+    portfolio: Portfolio

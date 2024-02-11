@@ -1,3 +1,6 @@
 [funds_filters]
 funds = []
 volatility_threshold = 0.02
+
+[portfolio]
+number_of_funds = 5
