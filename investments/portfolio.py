@@ -12,8 +12,21 @@ VALUES = "values"
 
 @dataclass
 class TimeSeries:
-    raw_data: pd.DataFrame  # values, dt
-    cnpj: str = ""
+    def __init__(
+        self,
+        raw_data: pd.DataFrame,
+        cnpj: str = "",
+        min_date: Optional[str] = None,
+        max_date: Optional[str] = None,
+    ):
+        self.raw_data = raw_data
+        self.cnpj = cnpj
+
+        min_date = self.raw_data[DT].min()
+        max_date = self.raw_data[DT].max()
+
+        self._min_date = min_date if min_date is not None else min_date
+        self._max_date = max_date if max_date is not None else max_date
 
     def calculate_value_at_end(
         self,
@@ -26,9 +39,6 @@ class TimeSeries:
         ][VALUES]
 
         product: float = values.product()  # type: ignore
-
-        self._min_date = values.min()
-        self._max_date = values.max()
 
         return product * initial_investiment
 
