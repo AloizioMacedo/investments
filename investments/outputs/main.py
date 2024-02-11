@@ -6,6 +6,7 @@ from typing import List
 
 import plotly.express as px
 from scipy.spatial import ConvexHull
+from tqdm import tqdm
 
 from investments.config import CONFIG
 from investments.portfolio import Portfolio, TimeSeries
@@ -53,7 +54,9 @@ def main():
     sharpe_ratios = []
     splits = []
 
-    for split in possible_splits:
+    for split in tqdm(
+        possible_splits, desc="Calculating portfolios based on granularity"
+    ):
         split = list(split)
         p = Portfolio(best, split)
 
