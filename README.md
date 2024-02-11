@@ -20,7 +20,7 @@ make run
 or directly
 
 ```bash
-python -m investments.main.py
+python -m investments.main
 ```
 
 and check the visualization of the efficient frontier with
