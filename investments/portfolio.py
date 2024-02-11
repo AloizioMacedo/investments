@@ -166,23 +166,3 @@ class Portfolio:
                 for split, ts in zip(self.split, self.time_series)
             ]
         )
-
-
-def main():
-    df = pd.DataFrame()
-
-    df[DT] = pd.date_range("2020-01-01", "2020-12-31")
-    df[VALUES] = 1 + np.random.normal(0, 0.1, len(df))
-
-    dfs = []
-
-    for _ in range(10):
-        df = pd.DataFrame()
-        df[DT] = pd.date_range("2020-01-01", "2020-12-31")
-        df[VALUES] = 1 + np.random.normal(0, 0.1, len(df))
-
-        dfs.append(df)
-
-
-if __name__ == "__main__":
-    main()
