@@ -4,3 +4,5 @@ volatility_threshold = 0.02
 
 [portfolio]
 number_of_funds = 5
+from_date = "2023-01-01"
+to_date = "2023-12-01"

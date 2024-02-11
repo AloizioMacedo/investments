@@ -57,12 +57,19 @@ def trim_columns(df: pd.DataFrame) -> pd.DataFrame:
         ]
     ].sort_values([RawData.CNPJ_Fundo, RawData.Data_Referencia])
 
+    df.rename(
+        columns={
+            RawData.Data_Referencia.value: "dt",
+            RawData.Percentual_Rentabilidade_Efetiva_Mes.value: "values",
+        },
+        inplace=True,
+    )
+
     return df
 
 
 def main():
     df = load_all_funds()
-    df = trim_columns(df)
 
     df[RawData.Percentual_Rentabilidade_Efetiva_Mes] = (
         1 + df[RawData.Percentual_Rentabilidade_Efetiva_Mes]
@@ -75,6 +82,7 @@ def main():
     df = filter_on_names(CONFIG.funds_filters.funds, df)
     df = filter_on_volatility(CONFIG.funds_filters.volatility_threshold, df)
 
+    df = trim_columns(df)
     df.to_csv(PREPROCESSED_FILES.joinpath("funds.csv"), index=False)
 
 
