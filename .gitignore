@@ -1,3 +1,5 @@
 *__pycache__*
-data
-!data/01_raw
+!data/
+
+data/*
+!data/01_raw/
