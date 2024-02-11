@@ -53,7 +53,6 @@ def trim_columns(df: pd.DataFrame) -> pd.DataFrame:
             RawData.CNPJ_Fundo,
             RawData.Data_Referencia,
             RawData.Percentual_Rentabilidade_Efetiva_Mes,
-            RawData.Percentual_Rentabilidade_Patrimonial_Mes,
         ]
     ].sort_values([RawData.CNPJ_Fundo, RawData.Data_Referencia])
 
