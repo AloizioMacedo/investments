@@ -2,7 +2,7 @@ import itertools
 import json
 import pickle
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import plotly.express as px
 from scipy.spatial import ConvexHull
@@ -27,27 +27,37 @@ def load_cdi_timeseries() -> TimeSeries:
         return pickle.load(file)
 
 
-def main():
-    time_series = load_funds_timeseries()
-    cdi_time_series = load_cdi_timeseries()
-
-    from_date = CONFIG.portfolio.from_date
-    to_date = CONFIG.portfolio.to_date
-
-    time_series.sort(key=lambda x: -x.calculate_value_at_end(from_date, to_date))
-
+def get_possible_splits() -> List[Tuple[float, ...]]:
     granularity = [
         CONFIG.portfolio.split_granularity * i
         for i in range(round(1.0 / CONFIG.portfolio.split_granularity) + 1)
     ]
 
-    granularities = itertools.combinations_with_replacement(
-        granularity, CONFIG.portfolio.number_of_funds
+    granularities = itertools.product(
+        granularity, repeat=CONFIG.portfolio.number_of_funds
     )
 
     possible_splits = [gran for gran in granularities if sum(gran) == 1.0]
+    return possible_splits
 
+
+def get_best_funds(from_date: str, to_date: str):
+    time_series = load_funds_timeseries()
+
+    time_series.sort(key=lambda x: -x.calculate_value_at_end(from_date, to_date))
     best = time_series[: CONFIG.portfolio.number_of_funds]
+    return best
+
+
+def main():
+    cdi_time_series = load_cdi_timeseries()
+
+    from_date = CONFIG.portfolio.from_date
+    to_date = CONFIG.portfolio.to_date
+
+    best_funds = get_best_funds(from_date, to_date)
+
+    possible_splits = get_possible_splits()
 
     vols = []
     rets = []
@@ -58,7 +68,7 @@ def main():
         possible_splits, desc="Calculating portfolios based on granularity"
     ):
         split = list(split)
-        p = Portfolio(best, split)
+        p = Portfolio(best_funds, split)
 
         vols.append(p.std_dev(from_date, to_date))
         rets.append(p.calculate_value_at_end(from_date, to_date))
@@ -95,7 +105,7 @@ def main():
     best_allocation = {
         "allocations": {
             ts.cnpj: split
-            for ts, split in zip(time_series, split_with_best_sharpe_ratio)
+            for ts, split in zip(best_funds, split_with_best_sharpe_ratio)
         },
         "sharpe_ratio": best_ratio,
         "expected_returns": ret,
