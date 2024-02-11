@@ -6,10 +6,11 @@ from typing import List
 
 import plotly.express as px
 import toml
-from config_schema import Config
-from paths import CONFIG_FILE
-from portfolio import Portfolio, TimeSeries
 from scipy.spatial import ConvexHull
+
+from investments.config_schema import Config
+from investments.paths import CONFIG_FILE
+from investments.portfolio import Portfolio, TimeSeries
 
 DATA_FOLDER = Path("data")
 

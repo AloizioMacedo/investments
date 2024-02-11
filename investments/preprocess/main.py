@@ -3,9 +3,10 @@ from typing import List
 
 import pandas as pd
 import toml
-from config_schema import Config
-from paths import CONFIG_FILE
-from raw_data_schema import RawData
+
+from investments.config_schema import Config
+from investments.paths import CONFIG_FILE
+from investments.preprocess.raw_data_schema import RawData
 
 DATA_FOLDER = Path("data")
 

@@ -11,7 +11,7 @@ Main parameters for the run of the portfolio chooser can be selected in the
 
 ## Running
 
-You can directly run the pipeline with
+You can directly run the full pipeline with
 
 ```bash
 make run
@@ -20,7 +20,7 @@ make run
 or directly
 
 ```bash
-python investments/main.py
+python -m investments.main.py
 ```
 
 and check the visualization of the efficient frontier with
@@ -40,6 +40,8 @@ it, just open the corresponding htmls in the data folder directly instead.
 
 ## Pipeline
 
+Each part of the pipeline can be run separately through the according subpackage.
+
 ### Raw files
 
 For the fund time series, we are currently capturing monthly data by using
@@ -58,10 +60,22 @@ A `"dt"` column contains date in the format `YYYY-MM-01`. The funds-related csv,
 `"funds.csv"` also has an additional column `"CNPJ_Fundo"`, corresponding to an
 identifier of the fund (c.f. <https://www.gov.br/receitafederal/pt-br/servicos/cadastro/cnpj>).
 
+To run this part of the pipeline, run
+
+```bash
+python -m investments.preprocess.main
+```
+
 ### Models
 
 Consists of pickled files of the time series of each fund, according to the `TimeSeries`
 class.
+
+To run this part of the pipeline, run
+
+```bash
+python -m investments.models.main
+```
 
 ### Outputs
 
@@ -70,3 +84,9 @@ interactiveness.
 
 Furthermore, we get the convex hull of the plot to more easily identify the efficient
 frontier.
+
+To run this part of the pipeline, run
+
+```bash
+python -m investments.outputs.main
+```

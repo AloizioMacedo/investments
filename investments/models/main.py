@@ -3,8 +3,9 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
-from portfolio import TimeSeries
-from raw_data_schema import RawData
+
+from investments.portfolio import TimeSeries
+from investments.preprocess.raw_data_schema import RawData
 
 DATA_FOLDER = Path("data")
 

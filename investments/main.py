@@ -1,6 +1,6 @@
-from models import main as run_models
-from outputs import main as run_outputs
-from preprocess import main as run_preprocess
+from investments.models.main import main as run_models
+from investments.outputs.main import main as run_outputs
+from investments.preprocess.main import main as run_preprocess
 
 
 def main():
