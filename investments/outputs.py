@@ -55,7 +55,8 @@ def main():
         grans.append(gran)
 
     fig = px.scatter(x=vols, y=rets, hover_name=grans)
-    fig.show()
+
+    fig.write_html(OUTPUTS_FILES.joinpath("scatter.html"))
     fig.write_image(OUTPUTS_FILES.joinpath("scatter.png"))
 
 
