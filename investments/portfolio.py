@@ -10,27 +10,6 @@ DT = "dt"
 VALUES = "values"
 
 
-def correlation(ts: List[TimeSeries], from_date: str, to_date: str) -> np.ndarray:
-    correlation = np.corrcoef(
-        [
-            ts.raw_data[(ts.raw_data[DT] >= from_date) & (ts.raw_data[DT] <= to_date)][
-                VALUES
-            ]
-            for ts in ts
-        ]
-    )
-
-    return correlation
-
-
-def get_correlation_energy(ts: List[TimeSeries], from_date: str, to_date: str) -> float:
-    cor = correlation(ts, from_date, to_date)
-
-    diagonal_contrib = sum(x**2 for x in cor.diagonal().flatten())
-    full_contrib = sum(x**2 for x in cor.flatten())
-    return ((full_contrib - diagonal_contrib) / 2) ** (1 / 2)
-
-
 @dataclass
 class TimeSeries:
     raw_data: pd.DataFrame  # values, dt
@@ -128,13 +107,6 @@ class Portfolio:
 
         self.split = split
 
-    def cost(self, from_date: str, to_date: str) -> float:
-        return (
-            self.std_dev(from_date, to_date)
-            + 10 * self.correlation_energy(from_date, to_date)
-            - 1 * self.calculate_value_at_end(from_date, to_date)
-        )
-
     def std_dev(self, from_date: str, to_date: str) -> float:
         portfolio_ts: pd.Series = sum(
             split
@@ -145,12 +117,6 @@ class Portfolio:
         )  # type: ignore
 
         return portfolio_ts.std()
-
-    def correlation_energy(self, from_date: str, to_date: str) -> float:
-        return get_correlation_energy(self.time_series, from_date, to_date)
-
-    def correlation(self, from_date: str, to_date: str) -> np.ndarray:
-        return correlation(self.time_series, from_date, to_date)
 
     def calculate_value_at_end(
         self,
