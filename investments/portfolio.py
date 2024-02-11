@@ -118,6 +118,36 @@ class Portfolio:
 
         return portfolio_ts.std()
 
+    def sharpe_ratio(
+        self, risk_free: TimeSeries, from_date: str, to_date: str
+    ) -> float:
+        portfolio_ts: pd.Series = sum(
+            split
+            * ts.raw_data[
+                (ts.raw_data[DT] >= from_date) & (ts.raw_data[DT] <= to_date)
+            ][VALUES]
+            for split, ts in zip(self.split, self.time_series)
+        )  # type: ignore
+        portfolio_ts = portfolio_ts.reset_index(drop=True)
+
+        risk_free_ts: pd.Series = risk_free.raw_data[
+            (risk_free.raw_data[DT] >= from_date) & (risk_free.raw_data[DT] <= to_date)
+        ][VALUES]
+        risk_free_ts = risk_free_ts.reset_index(drop=True)
+
+        excess = portfolio_ts - risk_free_ts
+
+        copied_df = risk_free.raw_data[
+            (risk_free.raw_data[DT] >= from_date) & (risk_free.raw_data[DT] <= to_date)
+        ].reset_index(drop=True)
+        copied_df[VALUES] = excess
+
+        excess_ts = TimeSeries(copied_df)
+        std = (excess_ts.variance(from_date, to_date)) ** (1 / 2)
+        avg = excess_ts.average(from_date, to_date)
+
+        return avg / std
+
     def calculate_value_at_end(
         self,
         from_date: str,
