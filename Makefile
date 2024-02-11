@@ -1,5 +1,5 @@
 viz:
-	firefox data/04_outputs/scatter.html
+	@firefox data/04_outputs/scatter.html
 
 run:
-	python investments/main.py
+	@python investments/main.py
