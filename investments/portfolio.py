@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import itertools
 from dataclasses import dataclass
 from typing import List
 
@@ -109,6 +110,16 @@ class Portfolio:
 
         self.split = split
 
+    def cost(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
+        return (
+            self.std_dev(from_date, to_date)
+            + 10 * self.correlation_energy(from_date, to_date)
+            - 1 * self.calculate_value_at_end(from_date, to_date)
+        )
+
+    def std_dev(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
+        return sum(ts.variance(from_date, to_date) for ts in self.time_series)
+
     def correlation_energy(self, from_date: dt.datetime, to_date: dt.datetime) -> float:
         return get_correlation_energy(self.time_series, from_date, to_date)
 
@@ -135,53 +146,50 @@ def main():
     df = pd.DataFrame()
 
     df[DT] = pd.date_range("2020-01-01", "2020-12-31")
-    df[VALUES] = 1 + np.random.rand(len(df))
+    df[VALUES] = 1 + np.random.normal(0, 0.1, len(df))
 
     ts = TimeSeries(df)
 
-    df2 = pd.DataFrame()
+    dfs = []
 
-    df2[DT] = pd.date_range("2020-01-01", "2020-12-31")
-    df2[VALUES] = 1 + np.random.rand(len(df))
+    for _ in range(10):
+        df = pd.DataFrame()
+        df[DT] = pd.date_range("2020-01-01", "2020-12-31")
+        df[VALUES] = 1 + np.random.normal(0, 0.1, len(df))
 
-    ts2 = TimeSeries(df2)
+        dfs.append(df)
 
-    print(
-        ts.calculate_value_at_end(
-            from_date=dt.datetime(2020, 1, 1),
-            to_date=dt.datetime(2020, 1, 3),
-        )
+    combinations = itertools.combinations(dfs, 2)
+
+    all_ts = [TimeSeries(x) for x in dfs]
+
+    portfolios = [
+        Portfolio([TimeSeries(x) for x in comb], [0.5, 0.5]) for comb in combinations
+    ]
+
+    best_portfolio = min(
+        portfolios,
+        key=lambda x: x.cost(
+            from_date=dt.datetime(2020, 1, 1), to_date=dt.datetime(2020, 12, 31)
+        ),
     )
 
-    print(
-        ts.variance(
-            from_date=dt.datetime(2020, 1, 1),
-            to_date=dt.datetime(2020, 1, 3),
-        )
-    )
+    ts1, ts2 = best_portfolio.time_series
+
+    ts1.raw_data.to_csv("ts1.csv")
+    ts2.raw_data.to_csv("ts2.csv")
 
     print(
-        ts.geometric_mean(
-            from_date=dt.datetime(2020, 1, 1),
-            to_date=dt.datetime(2020, 1, 3),
-        )
+        f"Best: {ts1.calculate_value_at_end(dt.datetime(2020, 1, 1), dt.datetime(2020, 12, 31))}"
     )
-
     print(
-        ts.correlation(
-            ts2,
-            from_date=dt.datetime(2020, 1, 1),
-            to_date=dt.datetime(2020, 1, 3),
-        )
+        f"Best: {ts2.calculate_value_at_end(dt.datetime(2020, 1, 1), dt.datetime(2020, 12, 31))}"
     )
 
-    print(correlation([ts, ts2], dt.datetime(2020, 1, 1), dt.datetime(2020, 1, 3)))
-
-    print(
-        get_correlation_energy(
-            [ts, ts2], dt.datetime(2020, 1, 1), dt.datetime(2020, 1, 3)
+    for ts in all_ts:
+        print(
+            f"Listing others: {ts.calculate_value_at_end(dt.datetime(2020, 1, 1), dt.datetime(2020, 12, 31))}"
         )
-    )
 
 
 if __name__ == "__main__":
