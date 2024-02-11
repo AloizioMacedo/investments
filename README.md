@@ -17,6 +17,12 @@ You can directly run the pipeline with
 make run
 ```
 
+or directly
+
+```bash
+python investments/main.py
+```
+
 and check the visualization of the efficient frontier with
 
 ```bash
