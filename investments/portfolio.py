@@ -40,6 +40,7 @@ def get_correlation_energy(
 @dataclass
 class TimeSeries:
     raw_data: pd.DataFrame  # values, dt
+    cnpj: str = ""
 
     def calculate_value_at_end(
         self,
