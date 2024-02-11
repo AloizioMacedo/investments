@@ -72,8 +72,8 @@ def main():
         1 + df[RawData.Percentual_Rentabilidade_Patrimonial_Mes]
     )
 
-    df = filter_on_volatility(CONFIG.funds_filters.volatility_threshold, df)
     df = filter_on_names(CONFIG.funds_filters.funds, df)
+    df = filter_on_volatility(CONFIG.funds_filters.volatility_threshold, df)
 
     df.to_csv(PREPROCESSED_FILES.joinpath("funds.csv"), index=False)
 
