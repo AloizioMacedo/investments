@@ -5,6 +5,7 @@ import pandas as pd
 import toml
 from config_schema import Config
 from paths import CONFIG_FILE
+from raw_data_schema import RawData
 
 DATA_FOLDER = Path("data")
 
@@ -17,22 +18,22 @@ CONFIG = Config(**CONFIG)
 
 
 def filter_on_volatility(vol: float, df: pd.DataFrame) -> pd.DataFrame:
-    names = df["CNPJ_Fundo"].unique()
+    names = df[RawData.CNPJ_Fundo].unique()
 
     to_keep = []
     for name in names:
-        new_df = df[df["CNPJ_Fundo"] == name]
-        if new_df["Percentual_Rentabilidade_Efetiva_Mes"].std() <= vol:
+        new_df = df[df[RawData.CNPJ_Fundo] == name]
+        if new_df[RawData.Percentual_Rentabilidade_Efetiva_Mes].std() <= vol:
             to_keep.append(name)
 
-    return df[df["CNPJ_Fundo"].isin(to_keep)]
+    return df[df[RawData.CNPJ_Fundo].isin(to_keep)]
 
 
 def filter_on_names(names: List[str], df: pd.DataFrame) -> pd.DataFrame:
     if not names:
         return df
 
-    return df[df["CNPJ_Fundo"].isin(names)]
+    return df[df[RawData.CNPJ_Fundo].isin(names)]
 
 
 def load_all_funds() -> pd.DataFrame:
@@ -49,12 +50,12 @@ def load_all_funds() -> pd.DataFrame:
 def trim_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df[
         [
-            "CNPJ_Fundo",
-            "Data_Referencia",
-            "Percentual_Rentabilidade_Efetiva_Mes",
-            "Percentual_Rentabilidade_Patrimonial_Mes",
+            RawData.CNPJ_Fundo,
+            RawData.Data_Referencia,
+            RawData.Percentual_Rentabilidade_Efetiva_Mes,
+            RawData.Percentual_Rentabilidade_Patrimonial_Mes,
         ]
-    ].sort_values(["CNPJ_Fundo", "Data_Referencia"])
+    ].sort_values([RawData.CNPJ_Fundo, RawData.Data_Referencia])
 
     return df
 
@@ -63,12 +64,12 @@ def main():
     df = load_all_funds()
     df = trim_columns(df)
 
-    df["Percentual_Rentabilidade_Efetiva_Mes"] = (
-        1 + df["Percentual_Rentabilidade_Efetiva_Mes"]
+    df[RawData.Percentual_Rentabilidade_Efetiva_Mes] = (
+        1 + df[RawData.Percentual_Rentabilidade_Efetiva_Mes]
     )
 
-    df["Percentual_Rentabilidade_Patrimonial_Mes"] = (
-        1 + df["Percentual_Rentabilidade_Patrimonial_Mes"]
+    df[RawData.Percentual_Rentabilidade_Patrimonial_Mes] = (
+        1 + df[RawData.Percentual_Rentabilidade_Patrimonial_Mes]
     )
 
     df = filter_on_volatility(CONFIG.funds_filters.volatility_threshold, df)
