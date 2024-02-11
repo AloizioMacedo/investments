@@ -1,8 +1,11 @@
 [funds_filters]
+# Names of the funds to be included. If empty, includes all
 funds = []
-volatility_threshold = 0.02
+
+# Funds with volatility above this threshold will be excluded
+volatility_threshold = 0.05
 
 [portfolio]
-number_of_funds = 5
-from_date = "2023-01-01"
-to_date = "2023-12-01"
+number_of_funds = 6      # Number of funds to consider for the portfolio
+from_date = "2023-01-01" # Start date to consider for the time series
+to_date = "2023-12-01"   # End date to consider for the time series

@@ -4,6 +4,11 @@ This is a simple portfolio chooser based on time series of investment funds, bas
 on the [Sharpe Ratio](https://en.wikipedia.org/wiki/Sharpe_ratio) and the
 [Efficient Frontier](https://en.wikipedia.org/wiki/Efficient_frontier).
 
+## Configuration
+
+Main parameters for the run of the portfolio chooser can be selected in the
+`config/config.toml` file.
+
 ## Running
 
 You can directly run the pipeline with
