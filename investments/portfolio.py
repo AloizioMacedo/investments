@@ -136,10 +136,15 @@ class Portfolio:
         )
 
     def std_dev(self, from_date: str, to_date: str) -> float:
-        return sum(
-            split * ts.variance(from_date, to_date)
+        portfolio_ts: pd.Series = sum(
+            split
+            * ts.raw_data[
+                (ts.raw_data[DT] >= from_date) & (ts.raw_data[DT] <= to_date)
+            ][VALUES]
             for split, ts in zip(self.split, self.time_series)
-        ) ** (1 / 2)
+        )  # type: ignore
+
+        return portfolio_ts.std()
 
     def correlation_energy(self, from_date: str, to_date: str) -> float:
         return get_correlation_energy(self.time_series, from_date, to_date)

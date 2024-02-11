@@ -18,7 +18,7 @@ def load_all_funds() -> pd.DataFrame:
 
 def convert_to_timeseries(df: pd.DataFrame) -> List[TimeSeries]:
     return [
-        TimeSeries(df[df[RawData.CNPJ_Fundo] == cnpj])
+        TimeSeries(df[df[RawData.CNPJ_Fundo] == cnpj].reset_index())
         for cnpj in df[RawData.CNPJ_Fundo].unique()
     ]
 
