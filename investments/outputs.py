@@ -8,6 +8,7 @@ import toml
 from config_schema import Config
 from paths import CONFIG_FILE
 from portfolio import Portfolio, TimeSeries
+from scipy.spatial import ConvexHull
 
 DATA_FOLDER = Path("data")
 
@@ -56,8 +57,18 @@ def main():
 
     fig = px.scatter(x=vols, y=rets, hover_name=grans)
 
-    fig.write_html(OUTPUTS_FILES.joinpath("scatter.html"))
-    fig.write_image(OUTPUTS_FILES.joinpath("scatter.png"))
+    fig.write_html(OUTPUTS_FILES.joinpath("risk_return.html"))
+    fig.write_image(OUTPUTS_FILES.joinpath("risk_return.png"))
+
+    points = list(zip(vols, rets))
+    ch = ConvexHull(points)
+
+    x_hull = [points[i][0] for i in ch.vertices]
+    y_hull = [points[i][1] for i in ch.vertices]
+
+    fig2 = px.scatter(x=x_hull, y=y_hull)
+    fig2.write_html(OUTPUTS_FILES.joinpath("convex_hull.html"))
+    fig2.write_image(OUTPUTS_FILES.joinpath("convex_hull.png"))
 
 
 if __name__ == "__main__":
