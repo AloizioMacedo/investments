@@ -9,7 +9,7 @@ from investments.preprocess.raw_data_schema import RawData
 DATA_FOLDER = Path("data")
 
 RAW_FILES = DATA_FOLDER.joinpath("01_raw")
-FUNDS = RAW_FILES.joinpath("fundos")
+FUNDS = RAW_FILES.joinpath("fundos_imobiliários")
 PREPROCESSED_FILES = DATA_FOLDER.joinpath("02_preprocessed")
 
 
