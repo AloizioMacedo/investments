@@ -2,10 +2,8 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
-import toml
 
-from investments.config_schema import Config
-from investments.paths import CONFIG_FILE
+from investments.config import CONFIG
 from investments.preprocess.raw_data_schema import RawData
 
 DATA_FOLDER = Path("data")
@@ -13,9 +11,6 @@ DATA_FOLDER = Path("data")
 RAW_FILES = DATA_FOLDER.joinpath("01_raw")
 FUNDS = RAW_FILES.joinpath("fundos")
 PREPROCESSED_FILES = DATA_FOLDER.joinpath("02_preprocessed")
-
-CONFIG = toml.load(CONFIG_FILE)
-CONFIG = Config(**CONFIG)
 
 
 def filter_on_volatility(vol: float, df: pd.DataFrame) -> pd.DataFrame:

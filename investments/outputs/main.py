@@ -5,20 +5,15 @@ from pathlib import Path
 from typing import List
 
 import plotly.express as px
-import toml
 from scipy.spatial import ConvexHull
 
-from investments.config_schema import Config
-from investments.paths import CONFIG_FILE
+from investments.config import CONFIG
 from investments.portfolio import Portfolio, TimeSeries
 
 DATA_FOLDER = Path("data")
 
 MODELS_FILES = DATA_FOLDER.joinpath("03_models")
 OUTPUTS_FILES = DATA_FOLDER.joinpath("04_outputs")
-
-CONFIG = toml.load(CONFIG_FILE)
-CONFIG = Config(**CONFIG)
 
 
 def load_funds_timeseries() -> List[TimeSeries]:
