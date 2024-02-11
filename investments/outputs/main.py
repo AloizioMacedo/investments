@@ -29,7 +29,7 @@ def load_cdi_timeseries() -> TimeSeries:
 
 def get_possible_splits() -> List[Tuple[float, ...]]:
     granularity = [
-        CONFIG.portfolio.split_granularity * i
+        round(CONFIG.portfolio.split_granularity * i, 5)
         for i in range(round(1.0 / CONFIG.portfolio.split_granularity) + 1)
     ]
 
