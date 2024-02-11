@@ -68,22 +68,56 @@ def trim_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def load_cdi() -> pd.DataFrame:
+    df = pd.read_csv(RAW_FILES.joinpath("cdi.csv"))
+    df = df.drop(columns=["Acumulado"])
+    df = df.melt(id_vars="Ano/Mês", var_name="month", value_name="values")
+
+    MONTHS = {
+        "Jan": 1,
+        "Fev": 2,
+        "Mar": 3,
+        "Abr": 4,
+        "Mai": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Ago": 8,
+        "Set": 9,
+        "Out": 10,
+        "Nov": 11,
+        "Dez": 12,
+    }
+
+    df["month"] = df["month"].apply(lambda x: str(MONTHS[x]).rjust(2, "0"))
+    df = df[df["values"] != "---"]
+
+    df.loc[:, "values"] = df["values"].apply(lambda x: x.replace(",", "."))
+    df.loc[:, "values"] = 1 + df["values"].astype(float) / 100
+    df.loc[:, "dt"] = df["Ano/Mês"].astype(str) + "-" + df["month"] + "-01"
+    df = df.drop(columns=["Ano/Mês", "month"])
+
+    return df
+
+
 def main():
-    df = load_all_funds()
+    funds = load_all_funds()
 
-    df[RawData.Percentual_Rentabilidade_Efetiva_Mes] = (
-        1 + df[RawData.Percentual_Rentabilidade_Efetiva_Mes]
+    funds[RawData.Percentual_Rentabilidade_Efetiva_Mes] = (
+        1 + funds[RawData.Percentual_Rentabilidade_Efetiva_Mes]
     )
 
-    df[RawData.Percentual_Rentabilidade_Patrimonial_Mes] = (
-        1 + df[RawData.Percentual_Rentabilidade_Patrimonial_Mes]
+    funds[RawData.Percentual_Rentabilidade_Patrimonial_Mes] = (
+        1 + funds[RawData.Percentual_Rentabilidade_Patrimonial_Mes]
     )
 
-    df = filter_on_names(CONFIG.funds_filters.funds, df)
-    df = filter_on_volatility(CONFIG.funds_filters.volatility_threshold, df)
+    funds = filter_on_names(CONFIG.funds_filters.funds, funds)
+    funds = filter_on_volatility(CONFIG.funds_filters.volatility_threshold, funds)
 
-    df = trim_columns(df)
-    df.to_csv(PREPROCESSED_FILES.joinpath("funds.csv"), index=False)
+    funds = trim_columns(funds)
+    funds.to_csv(PREPROCESSED_FILES.joinpath("funds.csv"), index=False)
+
+    cdi = load_cdi()
+    cdi.to_csv(PREPROCESSED_FILES.joinpath("cdi.csv"), index=False)
 
 
 if __name__ == "__main__":
