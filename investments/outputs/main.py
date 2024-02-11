@@ -35,7 +35,10 @@ def main():
 
     time_series.sort(key=lambda x: -x.calculate_value_at_end(from_date, to_date))
 
-    granularity = [0.05 * i for i in range(21)]
+    granularity = [
+        CONFIG.portfolio.split_granularity * i
+        for i in range(round(1.0 / CONFIG.portfolio.split_granularity) + 1)
+    ]
 
     granularities = itertools.combinations_with_replacement(
         granularity, CONFIG.portfolio.number_of_funds

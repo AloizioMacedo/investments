@@ -14,6 +14,7 @@ class Portfolio(BaseModel):
     number_of_funds: int
     from_date: str
     to_date: str
+    split_granularity: float
 
 
 class Config(BaseModel):
