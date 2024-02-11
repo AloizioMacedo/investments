@@ -6,7 +6,7 @@ funds = []
 volatility_threshold = 0.05
 
 [portfolio]
-number_of_funds = 6      # Number of funds to consider for the portfolio
-from_date = "2023-01-01" # Start date to consider for the time series
+number_of_funds = 4      # Number of funds to consider for the portfolio
+from_date = "2021-01-01" # Start date to consider for the time series
 to_date = "2023-12-01"   # End date to consider for the time series
-split_granularity = 0.1  # Minimum percentage of a split. Should divide 1 into equal parts.
+split_granularity = 0.25 # Minimum percentage of a split. Should divide 1 into equal parts.
