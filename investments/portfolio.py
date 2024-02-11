@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -28,17 +28,24 @@ class TimeSeries:
         self._min_date = min_date if min_date is not None else min_date
         self._max_date = max_date if max_date is not None else max_date
 
+        self._calculation_cache: Dict[Tuple[str, str], float] = {}
+
     def calculate_value_at_end(
         self,
         from_date: str,
         to_date: str,
         initial_investiment: float = 1.0,
     ) -> float:
+        if (result := self._calculation_cache.get((from_date, to_date))) is not None:
+            return result * initial_investiment
+
         values = self.raw_data[
             (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
         ][VALUES]
 
         product: float = values.product()  # type: ignore
+
+        self._calculation_cache[(from_date, to_date)] = product
 
         return product * initial_investiment
 
