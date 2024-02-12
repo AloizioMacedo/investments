@@ -135,6 +135,17 @@ class Portfolio:
 
         return portfolio_ts.std()
 
+    def average(self, from_date: str, to_date: str) -> float:
+        portfolio_ts: pd.Series = sum(
+            split
+            * ts.raw_data[
+                (ts.raw_data[DT] >= from_date) & (ts.raw_data[DT] <= to_date)
+            ][VALUES]
+            for split, ts in zip(self.split, self.time_series)
+        )  # type: ignore
+
+        return portfolio_ts.mean()
+
     def sharpe_ratio(
         self, risk_free: TimeSeries, from_date: str, to_date: str
     ) -> float:

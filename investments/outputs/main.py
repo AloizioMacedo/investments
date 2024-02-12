@@ -60,7 +60,8 @@ def main():
     possible_splits = get_possible_splits()
 
     vols = []
-    rets = []
+    avgs = []
+    rets_at_end = []
     sharpe_ratios = []
     splits = []
 
@@ -71,16 +72,17 @@ def main():
         p = Portfolio(best_funds, split)
 
         vols.append(p.std_dev(from_date, to_date))
-        rets.append(p.calculate_value_at_end(from_date, to_date))
+        avgs.append(p.average(from_date, to_date) - 1)
+        rets_at_end.append(p.calculate_value_at_end(from_date, to_date))
         sharpe_ratios.append(p.sharpe_ratio(cdi_time_series, from_date, to_date))
         splits.append(split)
 
-    fig = px.scatter(x=vols, y=rets, hover_name=splits)
+    fig = px.scatter(x=vols, y=avgs, hover_name=splits)
 
     fig.write_html(OUTPUTS_FILES.joinpath("risk_return.html"))
     fig.write_image(OUTPUTS_FILES.joinpath("risk_return.png"))
 
-    points = list(zip(vols, rets))
+    points = list(zip(vols, avgs))
     ch = ConvexHull(points)
 
     x_hull = [points[i][0] for i in ch.vertices]
@@ -92,14 +94,14 @@ def main():
     fig2.write_html(OUTPUTS_FILES.joinpath("convex_hull.html"))
     fig2.write_image(OUTPUTS_FILES.joinpath("convex_hull.png"))
 
-    vol, ret, best_ratio, split_with_best_sharpe_ratio = max(
+    vol, ret, ret_at_end, best_ratio, split_with_best_sharpe_ratio = max(
         (
-            (vol, ret, ratio, split)
-            for vol, ret, ratio, split in zip(
-                x_hull, y_hull, ch_sharpe_ratios, ch_splits
+            (vol, ret, ret_at_end, ratio, split)
+            for vol, ret, ret_at_end, ratio, split in zip(
+                x_hull, y_hull, rets_at_end, ch_sharpe_ratios, ch_splits
             )
         ),
-        key=lambda x: x[2],
+        key=lambda x: x[3],
     )
 
     best_allocation = {
@@ -108,8 +110,9 @@ def main():
             for ts, split in zip(best_funds, split_with_best_sharpe_ratio)
         },
         "sharpe_ratio": best_ratio,
-        "expected_returns": ret,
-        "expected_volatility": vol,
+        "expected_returns_at_end": ret_at_end,
+        "average": ret,
+        "volatility": vol,
     }
 
     with open(
