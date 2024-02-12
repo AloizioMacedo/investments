@@ -1,6 +1,6 @@
 [funds_filters]
 # Names of the funds to be included. If empty, includes all
-funds = []
+include = []
 
 # Names of funds to exclude. If empty, does not exclude any. Excludes funds after
 # including the ones selected above.

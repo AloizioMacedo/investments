@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import pandas as pd
 
@@ -42,7 +41,7 @@ def filter_on_volatility(vol: float, df: pd.DataFrame) -> pd.DataFrame:
 
 
 def filter_on_names(df: pd.DataFrame) -> pd.DataFrame:
-    names = CONFIG.funds_filters.funds
+    names = CONFIG.funds_filters.include
 
     if names:
         df = df[df[RawData.CNPJ_Fundo].isin(names)]
