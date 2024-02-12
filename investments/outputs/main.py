@@ -1,6 +1,7 @@
 import itertools
 import json
 import pickle
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
 
@@ -15,6 +16,15 @@ DATA_FOLDER = Path("data")
 
 MODELS_FILES = DATA_FOLDER.joinpath("03_models")
 OUTPUTS_FILES = DATA_FOLDER.joinpath("04_outputs")
+
+
+@dataclass
+class Statistics:
+    splits: List[Tuple[float, ...]]
+    volatilities: List[float]
+    average_returns: List[float]
+    returns_at_end: List[float]
+    sharpe_ratios: List[float]
 
 
 def load_funds_timeseries() -> List[TimeSeries]:
@@ -63,41 +73,36 @@ def main():
 
     possible_splits = get_possible_splits()
 
-    vols = []
-    avgs = []
-    rets_at_end = []
-    sharpe_ratios = []
-    splits = []
+    statistics = get_statistics_from_splits(
+        from_date, to_date, cdi_time_series, best_funds, possible_splits
+    )
 
-    for split in tqdm(
-        possible_splits, desc="Calculating portfolios based on granularity"
-    ):
-        split = list(split)
-        p = Portfolio(best_funds, split)
-
-        vols.append(p.std_dev())
-        avgs.append(p.average() - 1)
-        rets_at_end.append(p.calculate_value_at_end(from_date, to_date))
-        sharpe_ratios.append(p.sharpe_ratio(cdi_time_series))
-        splits.append(split)
-
-    efficient_frontier = px.scatter(x=vols, y=avgs, hover_name=splits)
+    efficient_frontier = px.scatter(
+        x=statistics.volatilities,
+        y=statistics.average_returns,
+        hover_name=statistics.splits,
+    )
 
     efficient_frontier.write_html(OUTPUTS_FILES.joinpath("efficient_frontier.html"))
     efficient_frontier.write_image(OUTPUTS_FILES.joinpath("efficient_frontier.png"))
 
-    risk_return = px.scatter(x=vols, y=rets_at_end, hover_name=splits)
+    risk_return = px.scatter(
+        x=statistics.volatilities,
+        y=statistics.average_returns,
+        hover_name=statistics.splits,
+    )
 
     risk_return.write_html(OUTPUTS_FILES.joinpath("risk_return.html"))
     risk_return.write_image(OUTPUTS_FILES.joinpath("risk_return.png"))
 
-    points = list(zip(vols, avgs))
+    points = list(zip(statistics.volatilities, statistics.average_returns))
     ch = ConvexHull(points)
 
     x_hull = [points[i][0] for i in ch.vertices]
     y_hull = [points[i][1] for i in ch.vertices]
-    ch_sharpe_ratios = [sharpe_ratios[i] for i in ch.vertices]
-    ch_splits = [splits[i] for i in ch.vertices]
+    rets_at_end = [statistics.returns_at_end[i] for i in ch.vertices]
+    ch_sharpe_ratios = [statistics.sharpe_ratios[i] for i in ch.vertices]
+    ch_splits = [statistics.splits[i] for i in ch.vertices]
 
     convex_hull = px.scatter(x=x_hull, y=y_hull, hover_name=ch_splits)
     convex_hull.write_html(OUTPUTS_FILES.joinpath("convex_hull.html"))
@@ -128,6 +133,34 @@ def main():
         DATA_FOLDER.joinpath("05_reporting").joinpath("best_allocation.json"), "w"
     ) as file:
         json.dump(best_allocation, file)
+
+
+def get_statistics_from_splits(
+    from_date: str,
+    to_date: str,
+    cdi_time_series: TimeSeries,
+    best_funds: List[TimeSeries],
+    possible_splits: List[Tuple[float, ...]],
+):
+    vols = []
+    avgs = []
+    rets_at_end = []
+    sharpe_ratios = []
+    splits = []
+
+    for split in tqdm(
+        possible_splits, desc="Calculating portfolios based on granularity"
+    ):
+        split = list(split)
+        p = Portfolio(best_funds, split)
+
+        vols.append(p.std_dev())
+        avgs.append(p.average() - 1)
+        rets_at_end.append(p.calculate_value_at_end(from_date, to_date))
+        sharpe_ratios.append(p.sharpe_ratio(cdi_time_series))
+        splits.append(split)
+
+    return Statistics(splits, vols, avgs, rets_at_end, sharpe_ratios)
 
 
 if __name__ == "__main__":
