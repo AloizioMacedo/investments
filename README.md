@@ -48,6 +48,12 @@ For the fund time series, we are currently capturing monthly data by using
 <https://dados.cvm.gov.br/dataset/fii-doc-inf_mensal>. This seems to be restricted
 only to real estate, so we probably want to expand this in the future.
 
+Meanwhile, since we aren't able to download this data programatically or structurally,
+we copy the tables from XP funds list for each year separately to an excel spreadsheet
+and export it as csv. In order for the pipeline to work, we establish that these files
+should be names as `{CNPJ}_{YEAR}.csv`, where `{CNPJ}` switches the slash char `/` for
+an underline. As an example, this would be a valid name: `32.319.351_0001-56_2023.csv`
+
 For the CDI time series, we capture the data directly by copy-pasting the data
 in the following link: <https://brasilindicadores.com.br/cdi/>.
 
