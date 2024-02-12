@@ -88,7 +88,7 @@ def main():
 
     risk_return = px.scatter(
         x=statistics.volatilities,
-        y=statistics.average_returns,
+        y=statistics.returns_at_end,
         hover_name=statistics.splits,
     )
 
