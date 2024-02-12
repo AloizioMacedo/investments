@@ -50,12 +50,16 @@ def get_best_funds(from_date: str, to_date: str):
 
 
 def main():
-    cdi_time_series = load_cdi_timeseries()
-
     from_date = CONFIG.portfolio.from_date
     to_date = CONFIG.portfolio.to_date
 
+    cdi_time_series = load_cdi_timeseries()
+    cdi_time_series.filter_ts(from_date, to_date)
+
     best_funds = get_best_funds(from_date, to_date)
+
+    for ts in best_funds:
+        ts.filter_ts(from_date, to_date)
 
     possible_splits = get_possible_splits()
 
@@ -69,12 +73,12 @@ def main():
         possible_splits, desc="Calculating portfolios based on granularity"
     ):
         split = list(split)
-        p = Portfolio(best_funds, cdi_time_series, split, from_date, to_date)
+        p = Portfolio(best_funds, split)
 
         vols.append(p.std_dev())
         avgs.append(p.average() - 1)
         rets_at_end.append(p.calculate_value_at_end(from_date, to_date))
-        sharpe_ratios.append(p.sharpe_ratio())
+        sharpe_ratios.append(p.sharpe_ratio(cdi_time_series))
         splits.append(split)
 
     efficient_frontier = px.scatter(x=vols, y=avgs, hover_name=splits)

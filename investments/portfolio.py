@@ -36,7 +36,8 @@ class TimeSeries:
 
         self.raw_data = self.raw_data[
             (self.raw_data[DT] >= from_date) & (self.raw_data[DT] <= to_date)
-        ]
+        ].reset_index()
+
         self._min_date = from_date
         self._max_date = to_date
 
@@ -126,20 +127,8 @@ class Portfolio:
     def __init__(
         self,
         time_series: List[TimeSeries],
-        risk_free: TimeSeries,
         split: List[float],
-        from_date: Optional[str] = None,
-        to_date: Optional[str] = None,
     ):
-        from_date = "0" if from_date is None else from_date
-        to_date = "A" if to_date is None else to_date
-
-        for ts in time_series:
-            ts.filter_ts(from_date, to_date)
-
-        risk_free.filter_ts(from_date, to_date)
-        self.risk_free = risk_free
-
         self.time_series = time_series
 
         if len(split) != len(time_series):
@@ -166,17 +155,17 @@ class Portfolio:
 
         return portfolio_ts.mean()
 
-    def sharpe_ratio(self) -> float:
+    def sharpe_ratio(self, risk_free: TimeSeries) -> float:
         portfolio_ts: pd.Series = sum(
             split * ts.raw_data[VALUES]
             for split, ts in zip(self.split, self.time_series)
         )  # type: ignore
 
-        risk_free_ts: pd.Series = self.risk_free.raw_data[VALUES]
+        risk_free_ts: pd.Series = risk_free.raw_data[VALUES]
 
         excess = portfolio_ts - risk_free_ts
 
-        copied_df = self.risk_free.raw_data.reset_index(drop=True)
+        copied_df = risk_free.raw_data.reset_index(drop=True)
         copied_df[VALUES] = excess
 
         excess_ts = TimeSeries(copied_df)
