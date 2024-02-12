@@ -69,12 +69,12 @@ def main():
         possible_splits, desc="Calculating portfolios based on granularity"
     ):
         split = list(split)
-        p = Portfolio(best_funds, split)
+        p = Portfolio(best_funds, cdi_time_series, split, from_date, to_date)
 
-        vols.append(p.std_dev(from_date, to_date))
-        avgs.append(p.average(from_date, to_date) - 1)
+        vols.append(p.std_dev())
+        avgs.append(p.average() - 1)
         rets_at_end.append(p.calculate_value_at_end(from_date, to_date))
-        sharpe_ratios.append(p.sharpe_ratio(cdi_time_series, from_date, to_date))
+        sharpe_ratios.append(p.sharpe_ratio())
         splits.append(split)
 
     efficient_frontier = px.scatter(x=vols, y=avgs, hover_name=splits)
