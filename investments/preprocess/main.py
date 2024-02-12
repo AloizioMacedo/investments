@@ -41,11 +41,17 @@ def filter_on_volatility(vol: float, df: pd.DataFrame) -> pd.DataFrame:
     return df[df[RawData.CNPJ_Fundo].isin(to_keep)]
 
 
-def filter_on_names(names: List[str], df: pd.DataFrame) -> pd.DataFrame:
-    if not names:
-        return df
+def filter_on_names(df: pd.DataFrame) -> pd.DataFrame:
+    names = CONFIG.funds_filters.funds
 
-    return df[df[RawData.CNPJ_Fundo].isin(names)]
+    if names:
+        df = df[df[RawData.CNPJ_Fundo].isin(names)]
+
+    exclude_list = CONFIG.funds_filters.exclude
+    if exclude_list:
+        df = df[~(df[RawData.CNPJ_Fundo].isin(exclude_list))]
+
+    return df
 
 
 def load_all_real_estate_funds() -> pd.DataFrame:
@@ -54,6 +60,9 @@ def load_all_real_estate_funds() -> pd.DataFrame:
     for file in REAL_ESTATE_FUNDS.iterdir():
         df = pd.read_csv(file, sep=";", encoding="ISO-8859-1")
         dfs.append(df)
+
+    if not dfs:
+        return pd.DataFrame()
 
     df = pd.concat(dfs)
     return df
@@ -127,21 +136,25 @@ def load_xp_funds() -> pd.DataFrame:
 def main():
     real_estate_funds = load_all_real_estate_funds()
 
-    real_estate_funds[RawData.Percentual_Rentabilidade_Efetiva_Mes] = (
-        1 + real_estate_funds[RawData.Percentual_Rentabilidade_Efetiva_Mes]
-    )
+    if not real_estate_funds.empty:
+        real_estate_funds[RawData.Percentual_Rentabilidade_Efetiva_Mes] = (
+            1 + real_estate_funds[RawData.Percentual_Rentabilidade_Efetiva_Mes]
+        )
 
-    real_estate_funds[RawData.Percentual_Rentabilidade_Patrimonial_Mes] = (
-        1 + real_estate_funds[RawData.Percentual_Rentabilidade_Patrimonial_Mes]
-    )
+        real_estate_funds[RawData.Percentual_Rentabilidade_Patrimonial_Mes] = (
+            1 + real_estate_funds[RawData.Percentual_Rentabilidade_Patrimonial_Mes]
+        )
+        real_estate_funds = filter_on_names(real_estate_funds)
+        real_estate_funds = filter_on_volatility(
+            CONFIG.funds_filters.volatility_threshold, real_estate_funds
+        )
 
-    real_estate_funds = filter_on_names(CONFIG.funds_filters.funds, real_estate_funds)
-    real_estate_funds = filter_on_volatility(
-        CONFIG.funds_filters.volatility_threshold, real_estate_funds
-    )
+        real_estate_funds = trim_columns(real_estate_funds)
 
-    real_estate_funds = trim_columns(real_estate_funds)
     funds = load_xp_funds()
+
+    if not funds.empty:
+        funds = filter_on_names(funds)
 
     all_funds = pd.concat([funds, real_estate_funds])
     all_funds.to_csv(PREPROCESSED_FILES.joinpath("funds.csv"), index=False)

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class FundsFilters(BaseModel):
     volatility_threshold: float
     funds: List[str]
+    exclude: List[str]
 
 
 class Portfolio(BaseModel):

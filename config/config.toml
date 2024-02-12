@@ -2,11 +2,15 @@
 # Names of the funds to be included. If empty, includes all
 funds = []
 
+# Names of funds to exclude. If empty, does not exclude any. Excludes funds after
+# including the ones selected above.
+exclude = ["23.565.803/0001-99"]
+
 # Funds with volatility above this threshold will be excluded
 volatility_threshold = 0.05
 
 [portfolio]
-number_of_funds = 6      # Number of funds to consider for the portfolio
+number_of_funds = 5      # Number of funds to consider for the portfolio
 from_date = "2021-01-01" # Start date to consider for the time series
 to_date = "2023-12-01"   # End date to consider for the time series
 split_granularity = 0.1  # Minimum percentage of a split. Should divide 1 into equal parts.
