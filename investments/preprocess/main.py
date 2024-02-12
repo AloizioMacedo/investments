@@ -156,9 +156,11 @@ def main():
         funds = filter_on_names(funds)
 
     all_funds = pd.concat([funds, real_estate_funds])
+    all_funds.sort_values(["CNPJ_Fundo", "dt"], inplace=True)
     all_funds.to_csv(PREPROCESSED_FILES.joinpath("funds.csv"), index=False)
 
     cdi = load_cdi()
+    cdi.sort_values("dt", inplace=True)
     cdi.to_csv(PREPROCESSED_FILES.joinpath("cdi.csv"), index=False)
 
 
