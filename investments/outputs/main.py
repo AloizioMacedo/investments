@@ -77,10 +77,15 @@ def main():
         sharpe_ratios.append(p.sharpe_ratio(cdi_time_series, from_date, to_date))
         splits.append(split)
 
-    fig = px.scatter(x=vols, y=avgs, hover_name=splits)
+    efficient_frontier = px.scatter(x=vols, y=avgs, hover_name=splits)
 
-    fig.write_html(OUTPUTS_FILES.joinpath("risk_return.html"))
-    fig.write_image(OUTPUTS_FILES.joinpath("risk_return.png"))
+    efficient_frontier.write_html(OUTPUTS_FILES.joinpath("efficient_frontier.html"))
+    efficient_frontier.write_image(OUTPUTS_FILES.joinpath("efficient_frontier.png"))
+
+    risk_return = px.scatter(x=vols, y=rets_at_end, hover_name=splits)
+
+    risk_return.write_html(OUTPUTS_FILES.joinpath("risk_return.html"))
+    risk_return.write_image(OUTPUTS_FILES.joinpath("risk_return.png"))
 
     points = list(zip(vols, avgs))
     ch = ConvexHull(points)
@@ -90,9 +95,9 @@ def main():
     ch_sharpe_ratios = [sharpe_ratios[i] for i in ch.vertices]
     ch_splits = [splits[i] for i in ch.vertices]
 
-    fig2 = px.scatter(x=x_hull, y=y_hull, hover_name=ch_splits)
-    fig2.write_html(OUTPUTS_FILES.joinpath("convex_hull.html"))
-    fig2.write_image(OUTPUTS_FILES.joinpath("convex_hull.png"))
+    convex_hull = px.scatter(x=x_hull, y=y_hull, hover_name=ch_splits)
+    convex_hull.write_html(OUTPUTS_FILES.joinpath("convex_hull.html"))
+    convex_hull.write_image(OUTPUTS_FILES.joinpath("convex_hull.png"))
 
     vol, ret, ret_at_end, best_ratio, split_with_best_sharpe_ratio = max(
         (
