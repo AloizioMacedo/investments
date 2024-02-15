@@ -44,10 +44,18 @@ def get_possible_splits() -> List[Tuple[float, ...]]:
     ]
 
     granularities = itertools.product(
-        granularity, repeat=CONFIG.portfolio.number_of_funds
+        granularity, repeat=(CONFIG.portfolio.number_of_funds - 1)
     )
 
-    possible_splits = [gran for gran in granularities if sum(gran) == 1.0]
+    possible_splits = []
+    for gran in granularities:
+        s = sum(gran)
+        if s > 1:
+            continue
+
+        split = (*gran, 1 - s)
+        possible_splits.append(split)
+
     return possible_splits
 
 
