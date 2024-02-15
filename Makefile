@@ -1,8 +1,8 @@
 viz:
-	@firefox data/04_outputs/risk_return.html
+	@firefox data/04_visualization/risk_return.html
 
 viz_hull:
-	@firefox data/04_outputs/convex_hull.html
+	@firefox data/04_visualization/convex_hull.html
 
 run:
 	@python -m investments.main

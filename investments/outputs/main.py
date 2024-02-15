@@ -15,7 +15,7 @@ from investments.portfolio import Portfolio, TimeSeries
 DATA_FOLDER = Path("data")
 
 MODELS_FILES = DATA_FOLDER.joinpath("03_timeseries")
-OUTPUTS_FILES = DATA_FOLDER.joinpath("04_outputs")
+OUTPUTS_FILES = DATA_FOLDER.joinpath("04_visualization")
 
 
 @dataclass
