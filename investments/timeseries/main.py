@@ -10,7 +10,7 @@ from investments.preprocess.raw_data_schema import RawData
 DATA_FOLDER = Path("data")
 
 PREPROCESSED_FILES = DATA_FOLDER.joinpath("02_preprocessed")
-MODELS_FILES = DATA_FOLDER.joinpath("03_models")
+MODELS_FILES = DATA_FOLDER.joinpath("03_timeseries")
 
 
 def load_all_funds() -> pd.DataFrame:

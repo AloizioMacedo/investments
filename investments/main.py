@@ -1,4 +1,4 @@
-from investments.models.main import main as run_models
+from investments.timeseries.main import main as run_models
 from investments.outputs.main import main as run_outputs
 from investments.preprocess.main import main as run_preprocess
 
