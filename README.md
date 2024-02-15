@@ -4,6 +4,10 @@ This is a simple portfolio chooser based on time series of investment funds, bas
 on the [Sharpe Ratio](https://en.wikipedia.org/wiki/Sharpe_ratio) and the
 [Efficient Frontier](https://en.wikipedia.org/wiki/Efficient_frontier).
 
+This is part of a dual study trying to compare the implementation of the same data
+science project in Python and Rust. Check out the [Rust repository](https://github.com/AloizioMacedo/investments_rs)
+in case you are interested.
+
 ## Configuration
 
 Main parameters for the run of the portfolio chooser can be selected in the
