@@ -72,7 +72,7 @@ To run this part of the pipeline, run
 python -m investments.preprocess.main
 ```
 
-### Models
+### Timeseries
 
 Consists of pickled files of the time series of each fund, according to the `TimeSeries`
 class.
@@ -80,7 +80,7 @@ class.
 To run this part of the pipeline, run
 
 ```bash
-python -m investments.models.main
+python -m investments.timeseries.main
 ```
 
 ### Outputs
