@@ -138,7 +138,7 @@ def main():
     }
 
     with open(
-        DATA_FOLDER.joinpath("05_reporting").joinpath("best_allocation.json"), "w"
+        DATA_FOLDER.joinpath("05_output").joinpath("allocation.json"), "w"
     ) as file:
         json.dump(best_allocation, file)
 
